@@ -10,7 +10,9 @@
 /* ============ [IMPORTS: SDK/Helpers Supabase] ============ */
 import {
   getUser, onAuthStateChange,
-  upsertPerfil, getPerfil, updateBestScore
+  upsertPerfil, getPerfil, updateBestScore,
+  /* 🆕 Import para manejar el hash de Supabase en GitHub Pages */
+  tryHandleAuthRedirect
 } from "./conecciones.js";
 
 /* ================== [DOM: Selectores base] ================= */
@@ -94,6 +96,9 @@ async function ensurePerfil(user) {
 
 /* ======= [SESIÓN: Inicio + ruteo a login/menú] ======= */
 (async () => {
+  /* 🆕 Consumir hash de Supabase (#access_token/#refresh_token) y limpiar URL */
+  await tryHandleAuthRedirect();
+
   const user = await getUser();
   currentUser = user;
 

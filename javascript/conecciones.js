@@ -1,7 +1,7 @@
 // ==========================================================
 //  CONECCIONES.JS – Cliente Supabase + Helpers de Auth/DB
 //  - Crea el cliente Supabase
-  //  - Health check para diagnosticar conexión/CORS
+//  - Health check para diagnosticar conexión/CORS
 //  - Helpers de autenticación (login/registro/logout)
 //  - Helpers de base de datos (perfil y mejor puntaje)
 //  - Manejo de redirects de verificación/email y OAuth
@@ -59,7 +59,13 @@ export async function signUpWithEmail(email, password, nombre){
   try {
     const { data, error } = await supabase.auth.signUp({
       email, password,
-      options: { data: { nombre } }
+      options: {
+        data: { nombre },
+        // ===== MOD: forzar redirección al deploy de GitHub Pages =====
+        emailRedirectTo: "https://gupi15.github.io/RedEvo/index.html"
+        // Alternativa si quieres ir directo al juego:
+        // emailRedirectTo: "https://gupi15.github.io/RedEvo/paginas/juego.html"
+      }
     });
     return { user: data?.user || null, error };
   } catch (e) {
@@ -117,7 +123,7 @@ export async function updateBestScore(userId, best){
 /* ============== [AUTH: MANEJO DE REDIRECTS (Email/OAuth)] ============== */
 // - Procesa errores en hash (#error=...)
 // - Toma sesiones en hash (#access_token + #refresh_token)
-// - Intercambia ?code=... (PKCE)
+// - Intercambia ?code=... (PKCE) usando la URL completa
 // - Limpia la URL después
 export async function tryHandleAuthRedirect() {
   // 0) #error=...
@@ -141,11 +147,10 @@ export async function tryHandleAuthRedirect() {
     }
   }
 
-  // 2) ?code=... (PKCE)
+  // 2) ?code=... (PKCE) — ===== MOD: usar URL completa =====
   const url = new URL(window.location.href);
-  const code = url.searchParams.get("code");
-  if (code) {
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+  if (url.searchParams.get("code")) {
+    const { error } = await supabase.auth.exchangeCodeForSession(window.location.href);
     url.searchParams.delete("code");
     url.searchParams.delete("type");
     history.replaceState({}, document.title, url.pathname + url.search + url.hash);
