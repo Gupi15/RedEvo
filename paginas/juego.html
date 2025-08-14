@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Rata Atrapa – Login + Juego</title>
+  <link rel="stylesheet" href="../estilos/juego.css"/>
+</head>
+<body>
+  <main class="app">
+    <!-- ===========================
+         HUD (título, stats, menú)
+         =========================== -->
+    <header class="hud">
+      <div class="titulo">🐭 Rata Atrapa</div>
+      <div class="stats">
+        <span>Puntos: <strong id="score">0</strong></span>
+        <span>Vidas: <strong id="lives">3</strong></span>
+        <span class="user-tag" id="userTag" aria-live="polite"></span>
+      </div>
+
+      <!-- 🆕 Botón para regresar al menú principal -->
+      <button id="btnMenuPrincipalHeader" class="btn volver-menu" type="button">
+        Menú principal
+      </button>
+    </header>
+
+    <!-- =======================================================
+         VISTA DE JUEGO (sin 'oculto' para que sea visible)
+         ======================================================= -->
+    <section id="gameView" class="tablero" aria-label="Zona de juego">
+      <!-- Sidebar con mejor puntaje -->
+      <aside class="sidebar">
+        <div class="best">
+          Mejor Puntaje: <strong id="bestScore">0</strong>
+        </div>
+      </aside>
+
+      <!-- Jugador -->
+      <div id="rata" class="rata" aria-label="Rata">
+        <img id="rataImg" src="../imagenes/rat_cafe.png" alt="Rata jugadora" draggable="false" />
+      </div>
+
+      <!-- Overlay de inicio / game over -->
+      <div id="mensaje" class="mensaje">
+        <h2 id="mensajeTitulo">¡Listo!</h2>
+        <p id="mensajeSub">Haz clic o toca para empezar</p>
+        <button id="btnEmpezar" class="btn grande">Empezar</button>
+      </div>
+    </section>
+
+    <!-- Ayuda -->
+    <footer class="ayuda">
+      Mueve el mouse (o arrastra con el dedo) para mover la rata. Atrapa las 🧀 y evita las 💩.
+    </footer>
+  </main>
+
+  <!-- ==========================================================
+       SCRIPTS (orden importa: conexión → lógica del juego)
+       Rutas relativas desde /paginas/
+       ========================================================== -->
+  <script type="module" src="../javascript/conecciones.js"></script>
+  <script type="module" src="../javascript/funciones.js"></script>
+</body>
+</html>

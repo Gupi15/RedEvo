@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rata Atrapa – Login / Registro</title>
+  <!-- 🧩 Usa el mismo CSS global -->
+  <link rel="stylesheet" href="../estilos/principal.css" />
+</head>
+<body>
+  <!-- ==========================================================
+       PANEL DE AUTENTICACIÓN (login/registro)
+       ========================================================== -->
+  <main id="authView" class="panel auth">
+    <!-- Tabs -->
+    <div class="tabs">
+      <button id="tabLogin" class="btn active" type="button">Iniciar sesión</button>
+      <button id="tabRegistro" class="btn" type="button">Registrarme</button>
+      <a class="btn ghost" style="margin-left:2%" href="../index.html">Inicio</a>
+    </div>
+
+    <!-- Form: Login -->
+    <form id="formLogin" class="form auth-form" autocomplete="on">
+      <label>Correo
+        <input id="loginEmail" type="email" required placeholder="tu@correo.com" />
+      </label>
+      <label>Contraseña
+        <input id="loginPass" type="password" required minlength="6" placeholder="••••••••" />
+      </label>
+      <button class="btn grande" type="submit">Entrar</button>
+    </form>
+
+    <!-- Form: Registro -->
+    <form id="formRegistro" class="form auth-form oculto" autocomplete="off">
+      <label>Nombre para mostrar
+        <input id="regNombre" type="text" required placeholder="RataPro" />
+      </label>
+      <label>Correo
+        <input id="regEmail" type="email" required placeholder="tu@correo.com" />
+      </label>
+      <label>Contraseña
+        <input id="regPass" type="password" required minlength="6" placeholder="mín. 6 caracteres" />
+      </label>
+      <button class="btn grande" type="submit">Crear cuenta</button>
+    </form>
+
+    <!-- Mensajes -->
+    <p id="authMsg" class="msg" aria-live="polite"></p>
+  </main>
+
+  <!-- ==========================================================
+       LÓGICA DE LOGIN/REGISTRO (solo para esta página)
+       ========================================================== -->
+  <script type="module">
+    import {
+      getUser, signInWithEmail, signUpWithEmail,
+      tryHandleAuthRedirect, resendSignup
+    } from "../javascript/conecciones.js";
+
+    /* ---------- DOM ---------- */
+    const tabLogin = document.getElementById("tabLogin");
+    const tabRegistro = document.getElementById("tabRegistro");
+    const formLogin = document.getElementById("formLogin");
+    const formRegistro = document.getElementById("formRegistro");
+    const authMsg = document.getElementById("authMsg");
+    const loginEmail = document.getElementById("loginEmail");
+    const loginPass = document.getElementById("loginPass");
+    const regNombre = document.getElementById("regNombre");
+    const regEmail  = document.getElementById("regEmail");
+    const regPass   = document.getElementById("regPass");
+
+    /* ---------- Tabs ---------- */
+    tabLogin.addEventListener("click", () => {
+      tabLogin.classList.add("active");
+      tabRegistro.classList.remove("active");
+      formLogin.classList.remove("oculto");
+      formRegistro.classList.add("oculto");
+      authMsg.textContent = "";
+    });
+    tabRegistro.addEventListener("click", () => {
+      tabRegistro.classList.add("active");
+      tabLogin.classList.remove("active");
+      formRegistro.classList.remove("oculto");
+      formLogin.classList.add("oculto");
+      authMsg.textContent = "";
+    });
+
+    /* ---------- Submit: Login ---------- */
+    formLogin.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      authMsg.textContent = "Ingresando...";
+      let timeout = setTimeout(() => {
+        authMsg.textContent = "⚠️ Sin respuesta del servidor. Revisa tu conexión o CORS.";
+      }, 10000);
+      try {
+        const { error } = await signInWithEmail(loginEmail.value, loginPass.value);
+        clearTimeout(timeout);
+        if (error) { authMsg.textContent = "⚠️ " + error.message; return; }
+        authMsg.textContent = "✅ ¡Bienvenido!";
+        // Ir al menú
+        window.location.href = "./menu.html";
+      } catch (e2) {
+        clearTimeout(timeout);
+        authMsg.textContent = "⚠️ Error inesperado al iniciar sesión.";
+      }
+    });
+
+    /* ---------- Submit: Registro ---------- */
+    formRegistro.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      authMsg.textContent = "Creando cuenta...";
+      const nombre = regNombre.value.trim();
+      try {
+        const { error } = await signUpWithEmail(regEmail.value, regPass.value, nombre);
+        if (error) { authMsg.textContent = "⚠️ " + error.message; return; }
+        authMsg.textContent = "✅ Revisa tu correo para confirmar.";
+      } catch (e2) {
+        authMsg.textContent = "⚠️ Error inesperado al registrarte.";
+      }
+    });
+
+    /* ---------- Manejo de redirects (confirmación por email, OAuth/PKCE) ---------- */
+    try {
+      const r = await tryHandleAuthRedirect?.();
+      if (r?.redirectError) {
+        if (r.redirectError.code === "otp_expired") {
+          authMsg.textContent = "⚠️ Tu enlace de verificación caducó o ya fue usado.";
+          // Botón para reenviar verificación
+          let btn = document.getElementById("btnResendVerify");
+          if (!btn) {
+            btn = document.createElement("button");
+            btn.id = "btnResendVerify";
+            btn.type = "button";
+            btn.className = "btn grande";
+            btn.textContent = "Reenviar verificación";
+            authMsg.insertAdjacentElement("afterend", btn);
+            btn.addEventListener("click", async () => {
+              const mail = regEmail.value || loginEmail.value || prompt("Escribe tu correo:") || "";
+              if (!mail) return;
+              authMsg.textContent = "Enviando verificación...";
+              const { error } = await resendSignup(mail.trim());
+              authMsg.textContent = error ? ("⚠️ " + error.message) : "✅ Enlace reenviado. Revisa tu correo.";
+            });
+          }
+        } else {
+          authMsg.textContent = `⚠️ ${r.redirectError.code}: ${r.redirectError.description}`;
+        }
+      }
+    } catch {}
+
+    /* ---------- Si ya hay sesión, ir al menú ---------- */
+  /* ---------- Forzar login SIEMPRE (aunque exista sesión) ---------- */
+  // Si llegamos de un callback de verificación/PKCE, muestra un mensaje amistoso
+  const fromCallback = location.hash.includes("access_token") || location.search.includes("code=");
+
+  // Si ya hay sesión, cerrarla para obligar a iniciar sesión/registrarse
+  const existing = await getUser();
+  if (existing) {
+    await signOut();
+    authMsg.textContent = fromCallback
+      ? "✅ Correo verificado. Ahora inicia sesión."
+      : "🔒 Por seguridad, inicia sesión para jugar.";
+    // Mostrar la pestaña de login por defecto
+    if (typeof tabLogin !== "undefined") tabLogin.click();
+  }
+
+
+  </script>
+</body>
+</html>
