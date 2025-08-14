@@ -1,0 +1,90 @@
+/* ==========================================================
+   MENÚ – Estilos
+   ========================================================== */
+:root{
+  --fondo: #0f172a;
+  --grad-a: #0b1020;
+  --grad-b: #0c1326;
+  --texto: #e5e7eb;
+  --sub: #cbd5e1;
+  --panel: #111827cc;
+  --btn: #334155;
+  --btn-ghost: #0b1320aa;
+  --acento: #22c55e;
+}
+
+*{ box-sizing: border-box; }
+html, body{ height:100%; margin:0; }
+body.menu{
+  color: var(--texto);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  background:
+    radial-gradient(60% 60% at 50% 40%, #1f2937 0%, var(--fondo) 70%),
+    linear-gradient(to bottom, var(--grad-a), var(--grad-b));
+}
+
+/* ===== Topbar ===== */
+.menu-topbar{
+  display:grid;
+  grid-template-columns: 1fr auto;
+  align-items:center;
+  padding: 2% 3%;
+}
+.menu-brand{
+  display:flex; align-items:center; gap: 2%;
+  font-weight:700; letter-spacing:.05em; font-size: 3vh;
+}
+.menu-logo{
+  width: 4vh; height: 4vh; display:grid; place-items:center;
+  background: var(--panel); border-radius: 30%;
+}
+.menu-actions{ display:flex; gap: 2%; }
+
+/* ===== Botones ===== */
+.btn{
+  text-decoration:none;
+  border:none;
+  background: var(--btn);
+  color: var(--texto);
+  padding: 1.2% 2.4%;
+  border-radius: 12%;
+  display:inline-grid; place-items:center;
+  font-size: 2.2vh;
+  cursor: pointer;
+}
+.btn:hover{ filter: brightness(1.1); }
+.btn.primary{ background: var(--acento); color:#0b1020; font-weight:700; }
+.btn.ghost{ background: var(--btn-ghost); outline: .2% solid #253047; }
+.btn.block{ width:100%; }
+
+/* ===== Área principal ===== */
+.menu-hero{
+  min-height: 80vh;
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3%;
+  padding: 2% 6% 4%;
+}
+.menu-card{
+  background: #0b1320aa;
+  border-radius: 3%;
+  padding: 3%;
+  outline: .3% solid #1f2937;
+}
+.menu-card h2{ margin: 0 0 2%; font-size: 3.2vh; }
+.menu-card p{ margin: 0 0 2%; font-size: 2.2vh; color: var(--sub); }
+.menu-profile strong{ color: var(--texto); }
+.menu-grid{ display:grid; gap: 2%; }
+
+/* ===== Footer ===== */
+.menu-footer{
+  text-align:center;
+  padding: 2% 6%;
+  font-size: 2vh;
+  opacity:.85;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 900px){
+  .menu-hero{ grid-template-columns: 1fr; gap: 4%; }
+}

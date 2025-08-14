@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rata Atrapa – Menú</title>
+  <!-- hoja de estilos del menú -->
+  <link rel="stylesheet" href="../estilos/menu.css" />
+</head>
+<body class="menu">
+  
+  <!-- Barra superior -->
+  <header class="menu-topbar">
+    <div class="menu-brand">
+      <div class="menu-logo">🐭</div>
+      <span>Rata Atrapa</span>
+    </div>
+    
+    <nav class="menu-actions">
+      <button id="btnLogout" class="btn">Cerrar sesión</button>
+    </nav>
+  </header>
+  
+  <!-- Contenido principal -->
+  <main class="menu-hero" aria-label="Menú principal">
+    <section class="menu-card menu-profile" aria-live="polite">
+      <h2>Tu perfil</h2>
+      <p><strong id="nombreJugador">…</strong></p>
+      <p>Mejor puntaje: <strong id="mejorPuntaje">0</strong></p>
+    </section>
+    
+    <section class="menu-card menu-play">
+      <h2>¿Listo para jugar?</h2>
+      <p>Atrapa el 🧀, esquiva la 💩. ¡Suerte!</p>
+      <a class="btn primary" href="./juego.html?play=1">Jugar ahora</a>
+    </section>
+    
+    <section class="menu-card menu-links">
+      <h2>Extras</h2>
+      <div class="menu-grid">
+        <a class="btn block ghost" href="#" aria-disabled="true">Tabla de clasificación (pronto)</a>
+        <a class="btn block ghost" href="#" aria-disabled="true">Opciones (pronto)</a>
+        <a class="btn block ghost" href="#" aria-disabled="true">Skins (pronto)</a>
+      </div>
+    </section>
+  </main>
+  
+  <footer class="menu-footer">
+    © <span id="anio"></span> Rata Atrapa — Menú
+  </footer>
+  
+  <!-- Lógica mínima del menú: leer sesión, cargar perfil, logout -->
+  <script type="module">
+    import {
+      getUser, signOut, getPerfil
+    } from "../javascript/conecciones.js";
+    
+    const nombreJugadorEl = document.getElementById("nombreJugador");
+    const mejorPuntajeEl  = document.getElementById("mejorPuntaje");
+    const btnLogout       = document.getElementById("btnLogout");
+    
+    // Año dinámico
+    document.getElementById("anio").textContent = new Date().getFullYear();
+    
+    // Si no hay sesión → ir a login
+    const user = await getUser();
+    if (!user) {
+      window.location.href = "./login.html";
+    } else {
+      // Mostrar nombre (de user_metadata o de la tabla perfiles)
+      let nombre = user.user_metadata?.nombre || (user.email ? user.email.split("@")[0] : "Jugador");
+      try {
+        const { data, error } = await getPerfil(user.id);
+        if (!error && data) {
+          if (data.nombre) nombre = data.nombre;
+          if (typeof data.mejor_puntaje === "number") {
+            mejorPuntajeEl.textContent = data.mejor_puntaje;
+          }
+        }
+      } catch {}
+      nombreJugadorEl.textContent = nombre;
+    }
+    
+    // Cerrar sesión
+    btnLogout.addEventListener("click", async () => {
+      await signOut();
+      window.location.href = "../index.html";
+    });
+  </script>
+</body>
+</html>
