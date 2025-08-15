@@ -34,7 +34,7 @@ body.menu{
   display:flex; align-items:center; gap: 2%;
   font-weight:700; letter-spacing:.05em; font-size: 3vh;
 }
-.menu-logo{
+.menu.logo{
   width: 4vh; height: 4vh; display:grid; place-items:center;
   background: var(--panel); border-radius: 30%;
 }

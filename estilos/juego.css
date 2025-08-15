@@ -36,8 +36,8 @@
   --gap-3: 4%;
 
   /* Medidas del jugador y objetos (gameplay) */
-  --rata-ancho: 10%;
-  --rata-alto: 10%;
+  --rata-ancho: 12%;
+  --rata-alto: 12%;
   --obj-ancho: 6%;
   --obj-alto: 8%;
 
@@ -45,7 +45,7 @@
   --vel-min: 18%;
   --vel-max: 35%;
 
-  /* Tamaños de HUD y textos in‑game */
+  /* Tamaños de HUD y textos in-game */
   --fs-hud: 220%;
   --fs-stats: 140%;
   --fs-best: 120%;
@@ -129,7 +129,6 @@ body{
 
 /* ==========================================================
    6) LAYOUT PRINCIPAL DEL JUEGO
-   - Grid de 3 filas: HUD / Tablero / Ayuda
    ========================================================== */
 .app{
   width:100%;
@@ -146,7 +145,7 @@ body{
    ========================================================== */
 .hud{
   display:grid;
-  grid-template-columns: 1fr auto auto; /* título | stats | logout */
+  grid-template-columns: 1fr auto auto; /* título | stats | botón extra */
   align-items:center;
   gap:2%;
   background: var(--panel);
@@ -163,18 +162,19 @@ body{
 
 
 /* ==========================================================
-   8) TABLERO DE JUEGO
+   8) TABLERO DE JUEGO — con imagen de fondo
    ========================================================== */
 .tablero{
-  position:relative;
-  width:100%; height:100%;
-  background: repeating-linear-gradient(
-    to bottom, #0b1020 0%, #0b1020 2%, #0c1326 2%, #0c1326 4%
-  );
-  border-radius:2%;
-  overflow:hidden;                 /* oculta objetos que salen */
-  outline:.3% solid #1f2937;       /* borde sutil */
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: url('../imagenes/fondo_tablero.png') no-repeat center center;
+  background-size: cover; /* La imagen se ajusta al tamaño del tablero */
+  border-radius: 2%;
+  overflow: hidden;
+  outline: .3% solid #1f2937;
 }
+
 
 
 /* ==========================================================
@@ -199,19 +199,18 @@ body{
   box-shadow: 0 2% 6% #00000055;
   will-change: transform;
 }
-/* Imagen dentro de la rata */
 .rata img{
   width:100%; height:100%;
   object-fit: contain;
   display:block;
   user-select: none;
   pointer-events: none;
-  image-rendering: auto; /* para pixel-art cambiar a crisp-edges */
+  image-rendering: auto;
 }
 
 
 /* ==========================================================
-   11) OBJETOS QUE CAEN (buenos/malos)
+   11) OBJETOS QUE CAEN
    ========================================================== */
 .obj{
   position:absolute;
@@ -240,16 +239,20 @@ body{
 /* ==========================================================
    13) PIE DE AYUDA
    ========================================================== */
-.ayuda{ display:grid; place-items:center; font-size: var(--fs-ayuda); opacity:.85; }
+.ayuda{
+  display:grid;
+  place-items:center;
+  font-size: var(--fs-ayuda);
+  opacity:.85;
+}
 
 
 /* ==========================================================
-   14) RESPONSIVE DEL JUEGO
-   - Breakpoints relativos con em. Sin px.
+   14) RESPONSIVE DEL JUEGO — Ajustes generales
    ========================================================== */
 @media (max-width: 60em){
   .stats{ gap:6%; }
-  .form{ width:80%; } /* si el login convive en esta vista */
+  .form{ width:80%; }
 }
 @media (max-width: 40em){
   .hud{ grid-template-columns: 1fr auto; gap:4%; }
@@ -260,43 +263,33 @@ body{
   .obj{ width:7%; height:9%; }
 }
 
-/* ==========================================================
-   RESPONSIVE MÓVIL — Overrides y mejoras de usabilidad
-   - Objetivo: pantallas < 480–600px de ancho
-   - Solo añadimos reglas; no eliminamos desktop
-   ========================================================== */
 
-/* ---------- 1) Ajustes generales y “notch” ---------- */
-@media (max-width: 40em){ /* ~640px */
-  /* padding que respeta notch/barras */
+/* ==========================================================
+   15) RESPONSIVE MÓVIL — Mejoras < 640px
+   ========================================================== */
+@media (max-width: 40em){
   .app{
     padding: calc(2% + env(safe-area-inset-top))
              calc(2% + env(safe-area-inset-right))
              calc(2% + env(safe-area-inset-bottom))
              calc(2% + env(safe-area-inset-left));
     gap: 3%;
-    grid-template-rows: auto 1fr auto; /* HUD auto-alto */
+    grid-template-rows: auto 1fr auto;
   }
-
-  /* tipografías más legibles en móvil */
   :root{
     --fs-hud: 180%;
-    --fs-stats: 130%;
+    --fs-stats: 100%;
     --fs-best: 120%;
     --fs-msg-h2: 220%;
     --fs-msg-p: 130%;
     --fs-ayuda: 120%;
-
-    /* jugador y objetos ligeramente más grandes */
-    --rata-ancho: 12%;
-    --rata-alto: 12%;
+    --rata-ancho: 5%;
+    --rata-alto: 5%;
     --obj-ancho: 7%;
     --obj-alto: 9%;
   }
-
-  /* ---------- 2) HUD compacto en una columna ---------- */
   .hud{
-    grid-template-columns: 1fr;   /* título arriba */
+    grid-template-columns: 1fr;
     row-gap: 2%;
     padding: 3% 3%;
   }
@@ -306,16 +299,11 @@ body{
     gap: 8%;
     font-size: var(--fs-stats);
   }
-  .hud .btn{ justify-self: center; padding: 3% 6%; } /* touch target */
-
-  /* ---------- 3) Tablero: relación vertical y scroll cero ---------- */
+  .hud .btn{ justify-self: center; padding: 1% 2%; }
   .tablero{
-    /* alto siempre visible sin “saltar” por barras del sistema */
-    min-height: 70vh;          /* suficiente área jugable */
-    aspect-ratio: 9 / 16;      /* vertical-friendly */
+    min-height: 70vh;
+    aspect-ratio: 9 / 16;
   }
-
-  /* ---------- 4) Sidebar: convertir en barra inferior ---------- */
   .sidebar{
     left: 50%; bottom: 3%; top: auto;
     transform: translateX(-50%);
@@ -324,32 +312,53 @@ body{
     padding: 3% 4%;
     border-radius: 8%;
   }
-
-  /* ---------- 5) Overlay: botones y textos más grandes ---------- */
   .mensaje h2{ font-size: var(--fs-msg-h2); }
-  .mensaje p{  font-size: var(--fs-msg-p); }
+  .mensaje p{ font-size: var(--fs-msg-p); }
   .btn.grande{ padding: 3.5% 7%; font-size: 150%; }
 }
 
-/* ---------- 6) Ultra-compacto (<360–400px de ancho) ---------- */
-@media (max-width: 25em){ /* ~400px */
+
+/* ==========================================================
+   16) RESPONSIVE ULTRA-COMPACTO < 400px
+   ========================================================== */
+@media (max-width: 25em){
   :root{
-    --rata-ancho: 14%;
-    --rata-alto: 14%;
+    --rata-ancho: 5%;
+    --rata-alto: 5%;
     --obj-ancho: 8%;
     --obj-alto: 10%;
   }
-  .stats{ gap: 5%; }
+  .stats{ gap: 7%; }
   .sidebar{ gap: 3%; padding: 4% 5%; }
 }
 
-/* ---------- 7) Evitar desplazamientos horizontales ---------- */
+
+/* ==========================================================
+   17) PREVENCIÓN DE SCROLL HORIZONTAL
+   ========================================================== */
 @media (max-width: 60em){
   html, body{ overflow-x: hidden; }
   .mensaje{ padding: 4%; }
 }
 
-/* ---------- 8) Preferencias del usuario (reduce motion) ---------- */
+
+/* ==========================================================
+   18) PREFERENCIAS DE USUARIO — Reduce Motion
+   ========================================================== */
 @media (prefers-reduced-motion: reduce){
   .rata, .obj{ transition: none !important; animation: none !important; }
+}
+
+
+/* ==========================================================
+   19) BLOQUEO DE SCROLL EN MÓVILES DURANTE EL JUEGO
+   ========================================================== */
+@media (max-width: 40em){
+  html, body{
+    height: 100svh;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+  .app{ min-height: 100svh; }
+  .tablero{ touch-action: none; }
 }
