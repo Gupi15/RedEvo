@@ -259,3 +259,97 @@ body{
   .rata{ width:12%; height:12%; }
   .obj{ width:7%; height:9%; }
 }
+
+/* ==========================================================
+   RESPONSIVE MÓVIL — Overrides y mejoras de usabilidad
+   - Objetivo: pantallas < 480–600px de ancho
+   - Solo añadimos reglas; no eliminamos desktop
+   ========================================================== */
+
+/* ---------- 1) Ajustes generales y “notch” ---------- */
+@media (max-width: 40em){ /* ~640px */
+  /* padding que respeta notch/barras */
+  .app{
+    padding: calc(2% + env(safe-area-inset-top))
+             calc(2% + env(safe-area-inset-right))
+             calc(2% + env(safe-area-inset-bottom))
+             calc(2% + env(safe-area-inset-left));
+    gap: 3%;
+    grid-template-rows: auto 1fr auto; /* HUD auto-alto */
+  }
+
+  /* tipografías más legibles en móvil */
+  :root{
+    --fs-hud: 180%;
+    --fs-stats: 130%;
+    --fs-best: 120%;
+    --fs-msg-h2: 220%;
+    --fs-msg-p: 130%;
+    --fs-ayuda: 120%;
+
+    /* jugador y objetos ligeramente más grandes */
+    --rata-ancho: 12%;
+    --rata-alto: 12%;
+    --obj-ancho: 7%;
+    --obj-alto: 9%;
+  }
+
+  /* ---------- 2) HUD compacto en una columna ---------- */
+  .hud{
+    grid-template-columns: 1fr;   /* título arriba */
+    row-gap: 2%;
+    padding: 3% 3%;
+  }
+  .titulo{ text-align:center; }
+  .stats{
+    justify-content: center;
+    gap: 8%;
+    font-size: var(--fs-stats);
+  }
+  .hud .btn{ justify-self: center; padding: 3% 6%; } /* touch target */
+
+  /* ---------- 3) Tablero: relación vertical y scroll cero ---------- */
+  .tablero{
+    /* alto siempre visible sin “saltar” por barras del sistema */
+    min-height: 70vh;          /* suficiente área jugable */
+    aspect-ratio: 9 / 16;      /* vertical-friendly */
+  }
+
+  /* ---------- 4) Sidebar: convertir en barra inferior ---------- */
+  .sidebar{
+    left: 50%; bottom: 3%; top: auto;
+    transform: translateX(-50%);
+    display: grid; grid-auto-flow: column;
+    gap: 4%;
+    padding: 3% 4%;
+    border-radius: 8%;
+  }
+
+  /* ---------- 5) Overlay: botones y textos más grandes ---------- */
+  .mensaje h2{ font-size: var(--fs-msg-h2); }
+  .mensaje p{  font-size: var(--fs-msg-p); }
+  .btn.grande{ padding: 3.5% 7%; font-size: 150%; }
+}
+
+/* ---------- 6) Ultra-compacto (<360–400px de ancho) ---------- */
+@media (max-width: 25em){ /* ~400px */
+  :root{
+    --rata-ancho: 14%;
+    --rata-alto: 14%;
+    --obj-ancho: 8%;
+    --obj-alto: 10%;
+  }
+  .stats{ gap: 5%; }
+  .sidebar{ gap: 3%; padding: 4% 5%; }
+}
+
+/* ---------- 7) Evitar desplazamientos horizontales ---------- */
+@media (max-width: 60em){
+  html, body{ overflow-x: hidden; }
+  .mensaje{ padding: 4%; }
+}
+
+/* ---------- 8) Preferencias del usuario (reduce motion) ---------- */
+@media (prefers-reduced-motion: reduce){
+  .rata, .obj{ transition: none !important; animation: none !important; }
+}
