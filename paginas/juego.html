@@ -60,5 +60,17 @@
        ========================================================== -->
   <script type="module" src="../javascript/conecciones.js"></script>
   <script type="module" src="../javascript/funciones.js"></script>
+  <script type="module">
+    import { startPrologo } from "../javascript/juego_prologo.js";
+    document.addEventListener("DOMContentLoaded", () => {
+      startPrologo({
+        gameViewId: "gameView",  // opcional si usas estos ids por defecto
+        rataId: "rata",
+        scoreId: "score",
+        livesId: "lives",
+      });
+    });
+  </script>
+
 </body>
 </html>
