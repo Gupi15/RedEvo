@@ -36,8 +36,8 @@
   --gap-3: 4%;
 
   /* Medidas del jugador y objetos (gameplay) */
-  --rata-ancho: 12%;
-  --rata-alto: 12%;
+  --rata-ancho: 5%;
+  --rata-alto: 18%;
   --obj-ancho: 6%;
   --obj-alto: 8%;
 
@@ -192,6 +192,7 @@ body{
    10) JUGADOR: LA RATA
    ========================================================== */
 .rata{
+  outline: 2px solid red;
   position:absolute; left:45%; bottom:2%;
   width:var(--rata-ancho); height:var(--rata-alto);
   transform:translateX(-50%);

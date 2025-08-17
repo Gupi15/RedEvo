@@ -193,21 +193,56 @@ function actualizar(ts) {
 }
 
 /* ============== [JUEGO: Colisiones y limpieza] ============== */
-function getRectPercent(el) {
+/* ► Ajuste global del alcance (en % del tablero) */
+const HITBOX_SHRINK = 2; // sube/baja para cambiar el alcance
+
+function getRectPercent(el, shrink = 0) {
   const rect = el.getBoundingClientRect();
   const base = gameView.getBoundingClientRect();
-  const left   = ((rect.left - base.left) / base.width) * 100;
-  const top    = ((rect.top  - base.top)  / base.height) * 100;
-  const width  = (rect.width  / base.width)  * 100;
-  const height = (rect.height / base.height) * 100;
+  let left   = ((rect.left - base.left) / base.width) * 100;
+  let top    = ((rect.top  - base.top)  / base.height) * 100;
+  let width  = (rect.width  / base.width)  * 100;
+  let height = (rect.height / base.height) * 100;
+
+  // 🔹 Reducir el área de colisión (shrink controla el recorte)
+  left   += shrink;
+  top    += shrink;
+  width  -= shrink * 2;
+  height -= shrink * 2;
+
   return { left, top, width, height };
 }
+
 function intersectan(a, b) {
   return !(a.left + a.width < b.left || b.left + b.width < a.left ||
            a.top + a.height < b.top || b.top + b.height < a.top);
 }
+
+/* ► Debug visual del hitbox reducido de la rata */
+let _debugHB = null;
+function _drawRataHitboxDebug(r){
+  if (!_debugHB){
+    _debugHB = document.createElement('div');
+    _debugHB.className = 'debug-hitbox';
+    _debugHB.style.position = 'absolute';
+    _debugHB.style.outline  = '0.8% solid red';
+    _debugHB.style.pointerEvents = 'none';
+    _debugHB.style.zIndex = '5';
+    gameView.appendChild(_debugHB);
+  }
+  _debugHB.style.left   = r.left + '%';
+  _debugHB.style.top    = r.top + '%';
+  _debugHB.style.width  = r.width + '%';
+  _debugHB.style.height = r.height + '%';
+}
+
 function manejarColisionesYLimpieza() {
-  const rRect = getRectPercent(rata);
+  // 👇 Usa el hitbox reducido configurado
+  const rRect = getRectPercent(rata, HITBOX_SHRINK);
+
+  // 🔴 Dibuja el hitbox reducido para verificar el alcance
+  _drawRataHitboxDebug(rRect);
+
   const restantes = [];
   for (const o of objetos) {
     const oRect = getRectPercent(o.el);
