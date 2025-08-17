@@ -88,3 +88,27 @@ body.menu{
 @media (max-width: 900px){
   .menu-hero{ grid-template-columns: 1fr; gap: 4%; }
 }
+
+
+/* ========== [OBJETIVOS: estilos visuales] ========== */
+.objetivo {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Estado alcanzado */
+.objetivo.completado {
+  background-color: #4caf50;   /* Verde éxito */
+  color: #fff;
+  font-weight: bold;
+  border: none;
+  pointer-events: none;        /* Ya no interactúa */
+}
+
+/* ========== [OBJETIVOS: refuerzo visual] ========== */
+.objetivo.completado{
+  background-color:#4caf50 !important; /* fuerza sobre ghost */
+  color:#fff !important;
+  font-weight:700;
+  outline:none !important;
+  border:none !important;
+}

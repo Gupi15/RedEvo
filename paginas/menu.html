@@ -31,58 +31,103 @@
       <p>Atrapa el 🧀, esquiva la 💩. ¡Suerte!</p>
       <a class="btn primary" href="./juego.html?play=1">Jugar ahora</a>
     </section>
-    
+  
     <section class="menu-card menu-links">
-      <h2>Extras</h2>
+      <h2>Objetivos</h2>
       <div class="menu-grid">
-        <a class="btn block ghost" href="#" aria-disabled="true">Tabla de clasificación (pronto)</a>
-        <a class="btn block ghost" href="#" aria-disabled="true">Opciones (pronto)</a>
-        <a class="btn block ghost" href="#" aria-disabled="true">Skins (pronto)</a>
+        <!-- ► Objetivo 1 -->
+        <div class="btn block ghost objetivo" id="obj-100" aria-disabled="true">
+          <strong>100 puntos</strong><br>
+          Avanza más profundo en la alcantarilla
+        </div>
+
+        <!-- ► Objetivo 2 -->
+        <div class="btn block ghost objetivo" id="obj-200" aria-disabled="true">
+          <strong>200 puntos</strong><br>
+          Llega al laboratorio ☣️
+        </div>
+
+        <!-- ► Objetivo 3 -->
+        <div class="btn block ghost objetivo" id="obj-500" aria-disabled="true">
+          <strong>500 puntos</strong><br>
+          Viaja por el portal 🌍
+        </div>
       </div>
     </section>
+
   </main>
   
   <footer class="menu-footer">
     © <span id="anio"></span> Red RPG Evolution — Menú
   </footer>
   
-  <!-- Lógica mínima del menú: leer sesión, cargar perfil, logout -->
+  <!-- ========== [MENÚ: sesión, perfil y objetivos] ========== -->
   <script type="module">
-    import {
-      getUser, signOut, getPerfil
-    } from "../javascript/conecciones.js";
-    
+    /* ===== Imports del proyecto ===== */
+    import { getUser, signOut, getPerfil } from "../javascript/conecciones.js";
+
+    /* ===== DOM ===== */
     const nombreJugadorEl = document.getElementById("nombreJugador");
     const mejorPuntajeEl  = document.getElementById("mejorPuntaje");
     const btnLogout       = document.getElementById("btnLogout");
-    
-    // Año dinámico
     document.getElementById("anio").textContent = new Date().getFullYear();
-    
-    // Si no hay sesión → ir a login
+
+    /* ========== [OBJETIVOS: helpers locales] ========== */
+    // ► Pone en verde y quita 'ghost'
+    function marcarObjetivo(id){
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.add("completado");
+      el.classList.remove("ghost");
+      el.setAttribute("aria-disabled", "false");
+    }
+    // ► Marca según puntaje
+    function actualizarObjetivos(puntos){
+      if (puntos >= 100) marcarObjetivo("obj-100");
+      if (puntos >= 200) marcarObjetivo("obj-200");
+      if (puntos >= 500) marcarObjetivo("obj-500");
+    }
+    // ► Fallback local
+    function leerMaxLocal(){
+      const v = parseInt(localStorage.getItem("maxPuntos") || "0", 10);
+      return Number.isFinite(v) ? v : 0;
+    }
+
+    /* ========== [MENÚ: flujo principal] ========== */
     const user = await getUser();
     if (!user) {
       window.location.href = "./login.html";
     } else {
-      // Mostrar nombre (de user_metadata o de la tabla perfiles)
+      // Nombre base
       let nombre = user.user_metadata?.nombre || (user.email ? user.email.split("@")[0] : "Jugador");
+
+      // Leer perfil de DB
+      let scoreDB = 0;
       try {
         const { data, error } = await getPerfil(user.id);
         if (!error && data) {
           if (data.nombre) nombre = data.nombre;
-          if (typeof data.mejor_puntaje === "number") {
-            mejorPuntajeEl.textContent = data.mejor_puntaje;
-          }
+          if (typeof data.mejor_puntaje === "number") scoreDB = data.mejor_puntaje;
         }
-      } catch {}
+      } catch(e) {
+        console.warn("getPerfil falló:", e);
+      }
+
+      // Usar máximo entre DB y localStorage
+      const mejor = Math.max(scoreDB, leerMaxLocal());
+
+      // Pintar UI
       nombreJugadorEl.textContent = nombre;
+      mejorPuntajeEl.textContent  = String(mejor);
+      actualizarObjetivos(mejor);
     }
-    
-    // Cerrar sesión
+
+    /* ========== [MENÚ: logout] ========== */
     btnLogout.addEventListener("click", async () => {
       await signOut();
       window.location.href = "../index.html";
     });
   </script>
+
 </body>
 </html>

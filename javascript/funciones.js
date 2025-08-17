@@ -304,6 +304,28 @@ async function terminarJuego() {
   }
 }
 
+/* ========== [OBJETIVOS: sistema de logros - script clásico] ========== */
+
+/* ► Marca un objetivo por id y quita 'ghost' si aplica */
+function marcarObjetivo(id){
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.add("completado");
+  el.classList.remove("ghost");           // evita fondo/outline del ghost
+  el.setAttribute("aria-disabled", "false");
+}
+
+/* ► Marca según puntaje */
+function actualizarObjetivos(puntos) {
+  if (puntos >= 100) marcarObjetivo("obj-100");
+  if (puntos >= 200) marcarObjetivo("obj-200");
+  if (puntos >= 500) marcarObjetivo("obj-500");
+}
+
+/* ► Exponer global */
+window.actualizarObjetivos = actualizarObjetivos;
+
+
 /* =================== [INIT: Pantalla inicial] =================== */
 resetear();
 mostrarMensaje("¡Listo!", "Haz clic o toca para empezar");
